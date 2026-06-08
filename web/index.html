@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack - מרכז שליחה ושחזור</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <div class="glow-bg glow-primary"></div>
+    <div class="glow-bg glow-secondary"></div>
+    
+    <div class="app-layout">
+        <!-- Sidebar (Right side for RTL) -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-area">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>BackTrack</h1>
+                        <div class="status-badge" id="statusBadge">
+                            <span class="pulse-dot"></span>
+                            <span class="status-text">פעיל ברקע</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="history-tab">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+                    <span>היסטוריית סגירות</span>
+                </button>
+                <button class="nav-item" data-tab="clipboard-tab">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                    <span>לוח העתקה</span>
+                </button>
+                <button class="nav-item" data-tab="snapshots-tab">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>
+                    <span>קבוצות עבודה</span>
+                </button>
+                <button class="nav-item" data-tab="windows-tab">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M3 9h6"/></svg>
+                    <span>סידור חלונות</span>
+                </button>
+</nav>
+
+            <!-- Private Mode Toggle Switch -->
+            <div class="private-mode-panel">
+                <div class="private-info">
+                    <div class="private-icon" id="privateIcon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div class="private-text">
+                        <span class="private-title">מצב פרטי</span>
+                        <span class="private-desc" id="privateDesc">הניטור פועל כסדרו</span>
+                    </div>
+                </div>
+                <label class="switch" aria-label="הפעל מצב פרטי">
+                    <input type="checkbox" id="privateModeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Credits Footer -->
+            <div class="sidebar-footer">
+                <span>נוצר על ידי <a href="https://lev-good.github.io/Good-heart/" target="_blank" rel="noopener noreferrer">לב טוב</a></span>
+            </div>
+        </aside>
+
+        <!-- Main Display Panel (Left side) -->
+        <main class="app-main">
+            <!-- Private Mode Mask Overlay -->
+            <div class="private-overlay" id="privateOverlay">
+                <div class="overlay-content">
+                    <div class="lock-shield-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h2>מצב פרטי פעיל</h2>
+                    <p>ניטור סייר הקבצים, האפליקציות ולוח ההעתקה מושהה זמנית.</p>
+                    <button class="btn btn-primary" id="disablePrivateBtn">כבה מצב פרטי</button>
+                </div>
+            </div>
+
+            <!-- Tab 1: Closed History -->
+            <div class="tab-content active" id="history-tab">
+                <header class="section-header">
+                    <h2>היסטוריית סגירות</h2>
+                    <button id="clearHistoryBtn" class="btn btn-danger btn-sm" title="נקה היסטוריה">נקה הכל</button>
+                </header>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg class="search-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="historySearch" placeholder="חפש בתיקיות, קבצים או אפליקציות שנסגרו..." autocomplete="off">
+                    </div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">הכל</button>
+                        <button class="filter-tab" data-filter="folder">תיקיות</button>
+                        <button class="filter-tab" data-filter="file">קבצים</button>
+                        <button class="filter-tab" data-filter="app">אפליקציות</button>
+                    </div>
+                </div>
+
+                <div class="empty-state" id="historyEmptyState">
+                    <div class="empty-svg-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>
+                    </div>
+                    <h3>ההיסטוריה ריקה</h3>
+                    <p>לאחר שתסגור תיקייה או אפליקציה כלשהי, היא תופיע כאן אוטומטית לשחזור מהיר.</p>
+                </div>
+
+                <div class="cards-list" id="historyList"></div>
+            </div>
+
+            <!-- Tab 2: Clipboard History -->
+            <div class="tab-content" id="clipboard-tab">
+                <header class="section-header">
+                    <h2>לוח העתקה</h2>
+                    <button id="clearClipboardBtn" class="btn btn-danger btn-sm" title="נקה לוח העתקה">נקה הכל</button>
+                </header>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg class="search-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="clipboardSearch" placeholder="חפש בטקסטים שהועתקו..." autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="empty-state" id="clipboardEmptyState">
+                    <div class="empty-svg-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                    </div>
+                    <h3>לוח ההעתקה ריק</h3>
+                    <p>כל טקסט שתעתיק מעתה באמצעות Ctrl+C יישמר כאן לשכפול ושחזור חוזר.</p>
+                </div>
+
+                <div class="clipboard-grid" id="clipboardList"></div>
+            </div>
+
+            <!-- Tab 3: Workspace Snapshots -->
+            <div class="tab-content" id="snapshots-tab">
+                <header class="section-header">
+                    <h2>קבוצות עבודה</h2>
+                    <button id="saveSnapshotBtn" class="btn btn-primary btn-sm">שמור מצב נוכחי (תוכנות + תיקיות)</button>
+                </header>
+
+                <div class="snapshots-info-banner">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    <span>שומרים קבוצה עם "שמור מצב נוכחי" (תוכנות + תיקיות + מסמכים). לחיצה על <b>"פתח כלשוניות"</b> תפתח את כל הפריטים ותאחד אותם לחלון אחד עם לשוניות. "חלונות נפרדים" יפתח כל אחד בנפרד.</span>
+                </div>
+
+                <div class="empty-state" id="snapshotsEmptyState">
+                    <div class="empty-svg-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>
+                    </div>
+                    <h3>אין קבוצות עבודה שמורות</h3>
+                    <p>פתח/י כמה תוכנות ותיקיות הקשורות לעבודה שלך, ולחצ/י על "שמור מצב נוכחי" למעלה כדי לשמור את כולן כקבוצה אחת.</p>
+                </div>
+
+                <div class="snapshots-list" id="snapshotsList"></div>
+            </div>
+            <!-- Tab 4: Window Arrange (Snap) -->
+            <div class="tab-content" id="windows-tab">
+                <header class="section-header">
+                    <h2>סידור חלונות צמודים</h2>
+                    <button id="refreshWindowsBtn" class="btn btn-secondary btn-sm">רענן רשימה</button>
+                </header>
+
+                <div class="snapshots-info-banner">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    <span>סמן/י 2 עד 4 חלונות פתוחים מהרשימה למטה, ואז לחצ/י על סוג הסידור הרצוי. החלונות יוצמדו אוטומטית זה לצד זה.</span>
+                </div>
+
+                <div class="layout-buttons">
+                    <button class="btn btn-primary layout-btn" data-layout="left-right">▌▐ שניים זה לצד זה</button>
+                    <button class="btn btn-primary layout-btn" data-layout="grid">▦ רשת (עד 4)</button>
+                    <button class="btn btn-primary layout-btn" data-layout="columns">▥ עמודות שוות</button>
+                    <button class="btn btn-primary layout-btn" data-layout="main-side">◧ ראשי גדול + צד</button>
+                    <button class="btn btn-secondary" id="tileAllBtn">סדר אוטומטית את כל החלונות</button>
+                    <button class="btn btn-primary" id="mergeWindowsBtn">🗂 מזג חלונות לקבוצת לשוניות</button>
+                    <button class="btn btn-secondary" id="saveSelectionBtn">💾 שמור בחירה כקבוצה</button>
+                </div>
+
+                <p style="opacity:.7;font-size:.85rem;margin:0 0 16px">בוחרים חלון אחד או יותר (תיקיות ו/או תוכנות) ולוחצים על הכפתור — הם יתאחדו לחלון אחד עם <b>לשוניות</b>. בתוך החלון המאוחד יש כפתור <b>➕ הוסף חלונות</b> ו-<b>📁 פתח תיקייה</b> להוספת לשוניות, וכפתור <b>↩ הוצא לשונית</b> להחזרת חלון בודד. <b>ניסיוני:</b> לא כל תוכנה מתאימה למיזוג; כדי לבטל הכול — פשוט סגרו את החלון המאוחד והכול חוזר למקומו.</p>
+
+                <div class="empty-state" id="windowsEmptyState" style="display:none;">
+                    <div class="empty-svg-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M3 9h6"/></svg>
+                    </div>
+                    <h3>לא נמצאו חלונות פתוחים</h3>
+                    <p>פתח/י כמה תוכנות (לדוגמה דפדפן, וורד, מחשבון) והן יופיעו כאן לבחירה והצמדה.</p>
+                </div>
+
+                <div class="cards-list" id="windowsList"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Snapshot Modal/Prompt Dialog -->
+    <div class="modal-backdrop" id="snapshotModal">
+        <div class="modal-content glass-panel">
+            <h3>שמירת קבוצת עבודה</h3>
+            <p>הזן שם עבור קבוצת העבודה הנוכחית שלך:</p>
+            <input type="text" id="snapshotNameInput" placeholder="למשל: פרוייקט עיצוב אתר, אוטומציות..." autocomplete="off">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelSnapshotBtn">ביטול</button>
+                <button class="btn btn-primary" id="confirmSnapshotBtn">שמור קבוצה</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Documents To Group Modal -->
+    <div class="modal-backdrop" id="addDocsModal">
+        <div class="modal-content glass-panel">
+            <h3>הוספת מסמכים לקבוצה</h3>
+            <p>בחר/י מסמכים שנפתחו לאחרונה כדי לצרף אותם לקבוצה:</p>
+            <div id="addDocsList" class="add-docs-list"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelAddDocsBtn">ביטול</button>
+                <button class="btn btn-primary" id="confirmAddDocsBtn">הוסף נבחרים</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+</body>
+</html>
