@@ -1,0 +1,13 @@
+# .NET build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Publish output
+publish/
+*.pdb
+
+# Rider / VS
+.idea/
